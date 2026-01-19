@@ -1,6 +1,6 @@
 # Advanced Server & Network Analysis Assistant 🌐
 
-[![Chrome Web Store](https://img.shields.io/badge/Chrome_Web_Store-Available-blue?logo=google-chrome)]([https://go.emrecb.com/dns-whois-ssl-hosting-sorgu-web-store](https://chromewebstore.google.com/detail/dns-whois-ssl-hosting-loo/fmcpddhkgcdgmhlloednpjiabfhaanff))
+[![Chrome Web Store](https://img.shields.io/badge/Chrome_Web_Store-Available-blue?logo=google-chrome)](https://chromewebstore.google.com/detail/dns-whois-ssl-hosting-loo/fmcpddhkgcdgmhlloednpjiabfhaanff)
 
 [**🇹🇷 Türkçe**](#proje-özeti) | [**🇬🇧 English**](#english-project-summary)
 
