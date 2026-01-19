@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>DNS, Whois, SSL, Hosting Lookup - Loruv</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="brand"><i class="fas fa-tools"></i> DNS, WHOIS, SSL, HOSTING <span>LOOKUP</span></div>
+        <div class="header-actions">
+            <button id="btnHelp" title="Yardım / Help"><i class="fas fa-question-circle"></i></button>
+            <select id="selLang" class="lang-select" title="Dil Seçimi">
+                <option value="tr">TR</option>
+                <option value="en">EN</option>
+            </select>
+            <button id="btnTheme" title="Tema"><i class="fas fa-moon"></i></button>
+            <button id="btnSettings" title="Ayarlar"><i class="fas fa-cog"></i></button>
+        </div>
+    </header>
+
+    <div class="search-area">
+        <div class="inp-wrapper">
+            <input type="text" id="domainInput" placeholder="domain.com" autocomplete="off">
+            <i class="fas fa-history history-icon" id="btnShowHistory"></i>
+        </div>
+        <button id="btnScan" data-i18n="btnScan">TARA</button>
+    </div>
+    
+    <div id="historyChips" class="history-chips"></div>
+    
+    <div class="quick-stats">
+        <div class="stat-badge" title="Sunucu Hızı (TTFB)"><i class="fas fa-bolt"></i> <span id="lblTTFB">-- ms</span></div>
+        <div class="stat-badge" title="Lokasyon"><i class="fas fa-globe"></i> <span id="lblLoc">--</span></div>
+        <div class="stat-badge" title="Proxy/CDN"><i class="fas fa-shield-alt"></i> <span id="lblCF">--</span></div>
+    </div>
+
+    <div class="tabs-nav">
+        <div class="tab-btn active" data-tab="tabOverview" data-i18n="tabOverview">Genel</div>
+        <div class="tab-btn" data-tab="tabDNS" data-i18n="tabDNS">DNS</div>
+        <div class="tab-btn" data-tab="tabWhois" data-i18n="tabWhois">Whois</div>
+        <div class="tab-btn" data-tab="tabServer" data-i18n="tabServer">Sunucu</div>
+        <div class="tab-btn" data-tab="tabMail" data-i18n="tabMail">Mail</div>
+        <div class="tab-btn" data-tab="tabShifts" data-i18n="tabShifts">Mesai</div>
+        <div class="tab-btn" data-tab="tabTools" data-i18n="tabTools">Araçlar</div>
+        <div class="tab-btn" data-tab="tabNotes" data-i18n="tabNotes">Notlar</div>
+    </div>
+
+    <div class="view-container">
+        <div id="tabOverview" class="view-section active">
+            <div class="card-grid">
+                <div class="info-card click-copy" data-tpl="cms">
+                    <div class="card-label" data-i18n="lblCMS">YAZILIM (CMS)</div>
+                    <div class="card-val" id="valCMS">...</div>
+                </div>
+                <div class="info-card click-copy" data-tpl="panel">
+                    <div class="card-label" data-i18n="lblPanel">PANEL TAHMİNİ</div>
+                    <div class="card-val" id="valPanel">...</div>
+                </div>
+                <div class="info-card click-copy" data-tpl="ssl_ok" id="cardSSL">
+                    <div class="card-label" data-i18n="lblSSL">SSL DURUMU</div>
+                    <div class="card-val" id="valSSL">...</div>
+                </div>
+                <div class="info-card click-copy" data-tpl="ip" id="cardIP">
+                    <div class="card-label" data-i18n="lblIP">IP ADRESİ</div>
+                    <div class="card-val" id="valIP">...</div>
+                </div>
+            </div>
+
+            <div class="info-card click-copy" data-tpl="ssl_redir_ok" id="cardRedirect" style="margin-bottom:10px; border-left:3px solid var(--text-sub);">
+                <div class="card-label" data-i18n="lblRedirect">HTTPS YÖNLENDİRME KONTROLÜ</div>
+                <div class="card-val" id="valSSLRedirect">...</div>
+                <div style="font-size:9px; color:var(--text-sub); margin-top:2px;" data-i18n="clickCopyHint">Tıkla ve Müşteriye Yanıtı Kopyala</div>
+            </div>
+            
+            <button id="btnCopyTicket" class="btn-full" data-i18n="btnCopyTicket">Destek Talebi Özeti Kopyala</button>
+        </div>
+
+        <div id="tabDNS" class="view-section">
+            <div class="sub-alert" id="subdomainAlert" style="display:none">
+                <i class="fas fa-exclamation-triangle"></i> <span data-i18n="subdomainAlert">Subdomain modu aktif.</span>
+            </div>
+            <table id="dnsTable">
+                <thead><tr><th data-i18n="thType">Tip</th><th data-i18n="thHost">Host</th><th data-i18n="thVal">Değer / ISP</th></tr></thead>
+                <tbody id="dnsBody"></tbody>
+            </table>
+            <div id="dnsLoading" class="loading-spin"><i class="fas fa-spinner fa-spin"></i> <span data-i18n="loading">Taranıyor...</span></div>
+        </div>
+
+        <div id="tabWhois" class="view-section">
+            <div class="info-card click-copy" data-tpl="whois" id="whoisCard">
+                <div class="card-label" data-i18n="lblRegInfo">TESCİL BİLGİLERİ</div>
+                <div id="whoisContent" style="white-space: pre-wrap; font-size:10px; font-family:monospace;">...</div>
+            </div>
+            <div style="margin-top:10px; display:grid; grid-template-columns:1fr 1fr; gap:10px">
+                <button class="btn-small" id="btnExtWhois1">TRABİS / .TR Sorgu</button>
+                <button class="btn-small" id="btnExtWhois2">ICANN Whois (Global)</button>
+            </div>
+        </div>
+
+        <div id="tabServer" class="view-section">
+            <table id="headersTable"><tbody id="headersBody"></tbody></table>
+            <button id="btnClearCache" class="btn-full bg-red" style="margin-top:10px" data-i18n="btnClearCache">Site Önbelleğini Temizle</button>
+        </div>
+
+        <div id="tabMail" class="view-section">
+            <div class="info-card" style="margin-bottom:10px">
+                <div class="card-label">MX ÖZETİ</div>
+                <div id="mxList" style="font-size:11px; line-height:1.4;">...</div>
+            </div>
+
+            <div style="margin-bottom:15px;">
+                <h4 style="margin:5px 0 8px 0; font-size:11px; color:var(--accent); border-bottom:1px solid var(--border); padding-bottom:4px;">GEREKLİ DNS KAYITLARI</h4>
+                <table id="mailDnsTable">
+                    <thead><tr><th style="width:40px">Tip</th><th>Host</th><th>Değer</th></tr></thead>
+                    <tbody id="mailDnsBody"></tbody>
+                </table>
+                <div id="mailDnsEmpty" style="font-size:10px; color:var(--text-sub); padding:5px; text-align:center; display:none;">Kayıt bulunamadı.</div>
+            </div>
+
+            <div class="card-grid">
+                <div class="info-card click-copy" data-tpl="spf">
+                    <div class="card-label">SPF KAYDI</div>
+                    <div class="card-val" id="valSPF">...</div>
+                </div>
+                <div class="info-card click-copy" data-tpl="dmarc">
+                    <div class="card-label">DMARC</div>
+                    <div class="card-val" id="valDMARC">...</div>
+                </div>
+            </div>
+            <div class="info-card click-copy" data-tpl="blacklist" id="blacklistResult" style="cursor:pointer">
+                <div class="card-label" data-i18n="lblBlacklist">KARALİSTE (BLACKLIST)</div>
+                <div class="card-val"><i class="fas fa-external-link-alt"></i> <span data-i18n="check">Kontrol Et</span></div>
+            </div>
+        </div>
+
+        <div id="tabShifts" class="view-section">
+            <div class="shift-panel">
+                <div style="font-size:10px; color:var(--text-sub)" data-i18n="localTime">YEREL SAAT</div>
+                <div id="liveClock" class="clock-big">00:00:00</div>
+                <div id="shiftListContainer" class="shift-list-container"></div>
+            </div>
+            
+            <div class="shift-panel" id="breakPanel">
+                <div id="activeBreakDisplay" class="hidden break-active-box">
+                    <div class="break-title" id="breakStatusText">MOLA SÜRÜYOR</div>
+                    <div id="breakCountdown" class="clock-big">00:00</div>
+                    <button id="btnEndBreak" class="btn-full bg-red" data-i18n="btnEndBreak">MOLAYI BİTİR</button>
+                </div>
+                
+                <div class="break-controls" id="breakButtons">
+                    <button class="btn-timer-card" id="btnStartMeal">
+                        <i class="fas fa-utensils"></i>
+                        <div data-i18n="btnMeal">YEMEK</div>
+                        <small><span id="lblMealDur">30</span> dk</small>
+                    </button>
+                    <button class="btn-timer-card" id="btnStartCoffee">
+                        <i class="fas fa-coffee"></i>
+                        <div data-i18n="btnBreak">MOLA</div>
+                        <small><span id="lblBreakDur">15</span> dk</small>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="tabTools" class="view-section">
+            <h3 data-i18n="headPass">Şifre Oluşturucu</h3>
+            <div style="display:flex; gap:5px; margin-bottom:15px;">
+                <input type="text" id="genPassOut" readonly style="font-family:monospace; color:var(--accent)">
+                <button id="btnGenPass" class="btn-small"><i class="fas fa-sync"></i></button>
+                <button id="btnCopyPass" class="btn-small"><i class="fas fa-copy"></i></button>
+            </div>
+
+            <h3 data-i18n="headLinks">Hızlı Linkler</h3>
+            <div class="card-grid">
+                <button class="btn-tool" id="toolIsUp">
+                    <i class="fas fa-power-off"></i> <span data-i18n="toolIsUp">Site Çökük mü?</span>
+                </button>
+                <button class="btn-tool" id="toolArchive">
+                    <i class="fas fa-history"></i> Wayback Machine
+                </button>
+                <button class="btn-tool" id="toolProp">
+                    <i class="fas fa-globe"></i> <span data-i18n="toolProp">DNS Yayılımı</span>
+                </button>
+                <button class="btn-tool" id="toolInto">
+                    <i class="fas fa-search"></i> IntoDNS
+                </button>
+                <button class="btn-tool" id="toolSpeed">
+                    <i class="fas fa-tachometer-alt"></i> PageSpeed
+                </button>
+                <button class="btn-tool" id="toolSucuri">
+                    <i class="fas fa-shield-virus"></i> Sucuri Scan
+                </button>
+                <button class="btn-tool" id="toolGT">
+                    <i class="fas fa-chart-line"></i> GTMetrix
+                </button>
+                <button class="btn-tool" id="toolTrends">
+                    <i class="fas fa-chart-bar"></i> Google Trends
+                </button>
+            </div>
+        </div>
+
+        <div id="tabNotes" class="view-section">
+             <h3 data-i18n="headCmd">Sık Kullanılan Komutlar</h3>
+             
+             <div class="note-item click-copy" data-tpl="note_linux">
+                <div class="card-label">LİNUX DİSK KONTROL</div>
+                <div class="cmd-code">df -h | grep ^/dev</div>
+                <div style="font-size:9px; color:#aaa; margin-top:3px">Disk doluluk oranlarını listeler.</div>
+             </div>
+
+             <div class="note-item click-copy" data-tpl="note_mysql">
+                <div class="card-label">MYSQL ONARIM</div>
+                <div class="cmd-code">mysqlcheck -A --auto-repair -u root -p</div>
+                <div style="font-size:9px; color:#aaa; margin-top:3px">Tüm veritabanlarını onarır.</div>
+             </div>
+             
+             <div class="note-item click-copy" data-tpl="note_logs">
+                <div class="card-label">CANLI LOG İZLEME</div>
+                <div class="cmd-code">tail -f /var/log/messages /var/log/syslog</div>
+             </div>
+        </div>
+
+    </div> 
+    
+    <footer class="footer-stylish">
+        <span><i class="fas fa-code"></i> Dev: Emre Çağrı</span>
+        <span>v8.7 Pro</span>
+    </footer>
+
+    <div id="modalSettings" class="modal">
+        <div class="modal-content">
+            <h3 style="border-bottom:1px solid var(--border); padding-bottom:10px;" data-i18n="settingsTitle">Ayarlar & Şablonlar</h3>
+            
+            <div class="tabs-nav" style="margin-bottom:15px; background:var(--bg);">
+                <div class="tab-btn active" id="tabSetGen" data-i18n="tabGen">Genel</div>
+                <div class="tab-btn" id="tabSetTpl" data-i18n="tabTpl">Şablonlar</div>
+                <div class="tab-btn" id="tabSetWatch" data-i18n="tabWatch">Aranacak Değerler</div>
+            </div>
+
+            <div id="viewSetGen" class="set-view">
+                <div class="setting-row"><label data-i18n="lblSetMeal">Yemek Süresi (Dk)</label><input type="number" id="setMealMin"></div>
+                <div class="setting-row"><label data-i18n="lblSetBreak">Mola Süresi (Dk)</label><input type="number" id="setBreakMin"></div>
+                <div class="setting-row">
+                    <label>Ek Subdomainler (DNS taraması için, virgülle ayırın)</label>
+                    <textarea id="setSubdomains" rows="3" style="width:100%; background:var(--panel); color:var(--text-main); border:1px solid var(--border); border-radius:4px; padding:5px;" placeholder="api, dev, test, cpanel"></textarea>
+                </div>
+            </div>
+            
+            <div id="viewSetWatch" class="set-view" style="display:none">
+                <p style="font-size:10px; color:var(--text-sub); margin-bottom:5px;" data-i18n="lblWatchDesc">Her satıra bir değer girin (IP, Domain, Text). Eşleşen DNS kayıtları vurgulanacaktır.</p>
+                <textarea id="setSearchValues" rows="10" style="width:100%; background:var(--panel); color:var(--text-main); border:1px solid var(--border); border-radius:4px; padding:5px;"></textarea>
+            </div>
+
+            <div id="viewSetTpl" class="set-view" style="display:none">
+                <p style="font-size:10px; color:var(--accent); margin-bottom:10px">{domain}, {ip}, {isp}, {mx}, {date}, {cms}</p>
+                
+                <div class="setting-row"><label>DNS (A):</label><input type="text" id="tpl_dns_a"></div>
+                <div class="setting-row"><label>DNS (MX):</label><input type="text" id="tpl_dns_mx"></div>
+                <div class="setting-row"><label>DNS (NS):</label><input type="text" id="tpl_dns_ns"></div>
+                <div class="setting-row"><label>DNS (TXT):</label><input type="text" id="tpl_dns_txt"></div>
+                
+                <div style="border-top:1px solid var(--border); margin:10px 0;"></div>
+
+                <div class="setting-row"><label>SSL OK:</label><input type="text" id="tpl_ssl_ok"></div>
+                <div class="setting-row"><label>SSL ERR:</label><input type="text" id="tpl_ssl_err"></div>
+                <div class="setting-row"><label>HTTPS OK:</label><input type="text" id="tpl_ssl_redir_ok"></div>
+                <div class="setting-row"><label>HTTPS ERR:</label><input type="text" id="tpl_ssl_redir_err"></div>
+                
+                <div style="border-top:1px solid var(--border); margin:10px 0;"></div>
+
+                <div class="setting-row"><label>WHOIS:</label><input type="text" id="tpl_whois"></div>
+                <div class="setting-row"><label>CMS:</label><input type="text" id="tpl_cms"></div>
+                <div class="setting-row"><label>Panel:</label><input type="text" id="tpl_panel"></div>
+                <div class="setting-row"><label>IP:</label><input type="text" id="tpl_ip"></div>
+                <div class="setting-row"><label>SPF:</label><input type="text" id="tpl_spf"></div>
+            </div>
+
+            <div style="text-align:right; margin-top:15px; border-top:1px solid var(--border); padding-top:10px;">
+                <button id="btnSaveSettings" class="btn-small bg-green" data-i18n="btnSave">KAYDET</button>
+                <button id="btnCloseSettings" class="btn-small bg-red" data-i18n="btnClose">KAPAT</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalTutorial" class="modal">
+        <div class="modal-content tutorial-content">
+            <h2 id="tutTitle" style="color:var(--accent); text-align:center; margin-bottom:15px;">Hoş Geldiniz</h2>
+            <div id="tutBody" class="tutorial-body" style="font-size:13px; line-height:1.6; color:var(--text-sub);">
+                </div>
+            <div class="dev-info-box" style="margin-top:15px; padding:10px; background:rgba(0,0,0,0.2); border-radius:6px; font-size:11px;">
+                <i class="fas fa-code"></i> Developer: <strong style="color:var(--text-main)">Emre Çağrı</strong>
+            </div>
+            <button id="btnCloseTutorial" class="btn-full bg-green" style="margin-top:15px;">ANLADIM / BAŞLA</button>
+        </div>
+    </div>
+
+    <div id="modalLangSelect" class="modal">
+        <div class="modal-content" style="text-align:center;">
+            <h2 style="color:var(--accent);">Language / Dil Seçimi</h2>
+            <div class="lang-box">
+                <div class="lang-opt" id="btnLangTR">
+                    <div style="font-size:24px;">🇹🇷</div>
+                    <div>TÜRKÇE</div>
+                </div>
+                <div class="lang-opt" id="btnLangEN">
+                    <div style="font-size:24px;">🇬🇧</div>
+                    <div>ENGLISH</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="toast"></div>
+    <script src="popup.js"></script>
+</body>
+</html>
