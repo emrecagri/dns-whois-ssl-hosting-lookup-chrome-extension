@@ -18,6 +18,8 @@ Hosting destek uzmanları, sistem yöneticileri ve web geliştiricileri için ta
 * **Özel Vurgulama Algoritması:** Teknik ekiplerin, önceden tanımladıkları IP veya NS adreslerini (kendi firma verilerini) DNS sonuçları arasında otomatik olarak renkli vurgulamasını sağlar. Bu özellik, hatalı yönlendirmelerin saniyeler içinde fark edilmesini sağlar.
 * **Ek Subdomain Tarama:** Standart alt alan adlarına ek olarak, kullanıcı tarafından belirlenen özel subdomainleri de sorguya dahil eder.
 
+![image](screenshots/tr/1.png)
+
 #### 🔒 Gelişmiş SSL ve Sunucu Tanılama
 * **Canlı Kontrol (Live Check):** Sadece veritabanı kayıtlarına güvenmez; anlık SSL geçerliliği, bitiş süresi, sağlayıcı (Issuer) firma ve HTTPS yönlendirme durumunu analiz eder.
 * **Altyapı Tespiti:** HTTP Header analizi ile sunucu panelini (cPanel, Plesk vb.) ve CMS altyapısını tespit eder.
